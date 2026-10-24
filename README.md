@@ -20,7 +20,7 @@ Bộ phân tích và đề xuất tổ chức phát triển MyDmsVn, lập ngày
 - `assessments/` ghi nhận source và bằng chứng ở một commit xác định. Đây không phải kết quả chạy lại Windows, SQL hay GUI.
 - `proposals/` là phương án để Owner lựa chọn. [Bảng quyết định](proposals/2026-10-24-adoption.md#1-lựa-chọn) là nơi duy nhất ghi trạng thái lựa chọn của bộ đề xuất này.
 - Tên repo, project, đường dẫn tương lai và các skill trong đề xuất chưa có nghĩa chúng đã được tạo hoặc hoạt động.
-- Bộ tài liệu này không thay thế roadmap UI-NEXT của repo sản phẩm. Quyết định tái tổ chức cần được ghi nhận trước khi chuyển thành công việc triển khai.
+- [Quyết định phạm vi](proposals/2026-10-24-adoption.md#phạm-vi-được-owner-giao-ngày-24102026) ghi nhận Owner đã giao riêng PR A0. Điều hướng và tiến độ thực thi thuộc repo sản phẩm; bộ đề xuất này không tạo một queue song song hoặc tự kích hoạt A1.
 
 Sau khi lựa chọn, chỉ phần được duyệt mới trở thành quy chuẩn hiện hành. Tài liệu kỹ thuật đi cùng source, lệnh test và trạng thái thực thi vẫn do repo sở hữu code quản lý; không sao chép toàn bộ chúng sang đây.
 

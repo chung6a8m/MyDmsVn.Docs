@@ -1,6 +1,6 @@
 # Triển khai A0–A1: một đường đọc hiện hành và Sales UI Lab
 
-**Ngày:** 24/10/2026. **Loại tài liệu:** hướng dẫn triển khai đề xuất, chưa kích hoạt công việc trong repo sản phẩm. Trạng thái lựa chọn chỉ ghi tại [bảng quyết định](2026-10-24-adoption.md#1-lựa-chọn). Việc commit hướng dẫn này không phải kết quả triển khai hoặc nghiệm thu A0/A1.
+**Ngày:** 24/10/2026. **Loại tài liệu:** hướng dẫn triển khai A0–A1, không phải bảng tiến độ. Trạng thái lựa chọn và [phạm vi đã được giao](2026-10-24-adoption.md#phạm-vi-được-owner-giao-ngày-24102026) chỉ ghi tại adoption document; thực thi thuộc plan trong repo sản phẩm. Việc commit hướng dẫn không tự duyệt mọi phase hoặc cung cấp nghiệm thu runtime.
 
 **Mục tiêu:** một developer/Codex tìm đúng việc hiện hành từ một điểm vào; mở, sửa và kiểm tra Sales workspace thật bằng dữ liệu giả lập, không cần SQL hoặc đăng nhập thật.
 
@@ -12,7 +12,7 @@
 
 ## 1. Kết quả và thứ tự giao việc
 
-| PR tương lai | Đầu ra có thể xem được | Điều kiện đóng |
+| Đợt triển khai | Đầu ra có thể xem được | Điều kiện đóng |
 |---|---|---|
 | **PR 1 — A0: documentation entry and status cleanup** | Một đường đọc và một kế hoạch thực thi hiện hành; chỉ dẫn DateInput đã cũ được sửa/đánh dấu lịch sử | Các entry pages dẫn tới cùng queue; liên kết/evidence còn đúng; diff chỉ Markdown |
 | **PR 2 — A1: native Sales UI Lab** | Chạy Sales list/editor thật bằng fixtures; chọn/reset kịch bản; test native riêng | Checkout sạch trên Windows chạy không cần SQL/credentials; sáu kịch bản đạt trong phạm vi khai báo; graph không kéo server |
@@ -61,7 +61,7 @@ Tại baseline, một số entry pages còn ghi DateInput chưa bắt đầu và
 | `docs/ui-next/20261024-dateinput-unified-compact-design.md` | Phân biệt trạng thái khi thiết kế với acceptance được ghi về sau; dẫn tới evidence |
 | `docs/ui-next/20261023-validation-and-handoff.md` | Giữ làm acceptance reference lịch sử; dẫn tới queue kế nhiệm |
 
-Đây là 16 file hiện hữu và một plan mới theo baseline. Phần lớn thay đổi là đoạn đầu hoặc liên kết; không cần đổi tên/di chuyển cả cây tài liệu. Nếu HEAD mới đã sửa một điểm, không sửa lại máy móc.
+Đây là map khởi đầu của 16 file trọng tâm và một plan mới, chưa bao gồm mọi current-routing banner trong technical docs, ADR và các trang evidence cũ. Quét đầy đủ khi triển khai để sửa các wrapper còn gọi một roadmap khác là hiện hành; [inventory của PR A0](https://github.com/chung6a8m/MyDmsVn/blob/10c8e147c08a492801658cbc31f9ce767b00f653/docs/plans/20261024-001-a0-a1-sales-ui-lab.md) ghi phạm vi đã đối chiếu. Phần lớn thay đổi là đoạn đầu hoặc liên kết; không cần đổi tên/di chuyển cả cây tài liệu. Nếu HEAD mới đã sửa một điểm, không sửa lại máy móc.
 
 Chuyển trạng thái queue và các pointer **trong cùng PR**. Không search-and-replace mọi `NOT STARTED`/`NOT RUN`: nhiều câu mô tả đúng thời điểm lịch sử. Giữ DateInput candidate đầu bị Owner FAIL, kết quả có giới hạn về sau, T13 retained failures, SAL acceptance còn mở và release prerequisites. Đóng một queue không hoàn tất hoặc miễn các giới hạn đó. [S2][S3]
 
