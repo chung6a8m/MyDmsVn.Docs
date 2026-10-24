@@ -11,6 +11,7 @@ Bộ phân tích và đề xuất tổ chức phát triển MyDmsVn, lập ngày
 | Làm sao phác họa nhanh, thử UI bằng mock và chuẩn bị Web? | [UI Lab và prototype Web](proposals/2026-10-24-ui-prototyping.md) |
 | Giữ docs, tests và skills gọn mà đủ tin cậy? | [Docs, tests và Codex skills](proposals/2026-10-24-docs-tests-skills.md) |
 | Chọn phương án nào, triển khai theo thứ tự nào? | [Lựa chọn và lộ trình áp dụng](proposals/2026-10-24-adoption.md) |
+| Cụ thể triển khai A0–A1 bằng những PR, project và kiểm tra nào? | [Hướng dẫn triển khai A0–A1](proposals/2026-10-24-a0-a1-implementation.md) |
 
 **Đề xuất chính:** một repo sản phẩm với các điểm chạy/build/test độc lập; gom hai thư viện WinForms thường thay đổi cùng nhau vào một repo toolkit nhưng giữ ranh giới assembly; một nơi sở hữu mỗi loại tài liệu; UI Lab native và prototype Web dùng chung ý nghĩa kịch bản; kiểm thử theo hành vi/rủi ro; sáu skills nhỏ gắn với repo thực thi.
 
