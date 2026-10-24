@@ -184,7 +184,7 @@ Với Close workspace, giữ Form/workspace mở trong lúc `await` coordinator,
 
 Trong A1, đưa các ca pilot vào `Desktop.Ui.Tests`; chọn behavioral oracles theo sáu scenario. Scenario/API/VM cases có thể không mở GUI nhưng cùng project mới này vẫn là net48/native test owner; đây chưa phải một bộ test portable đa nền tảng. Chưa cần chuyển tất cả Session tests hoặc tách thêm pure-test project thứ tư.
 
-Native cases phải dùng STA, message loop khi cần, serialization, exception/DataError capture, timeout và disposal như protections hiện tại. Không reference assembly `Desktop.Tests` để lấy helper vì sẽ kéo lại graph cũ. Phương án nhỏ nhất là link source `StaTest.cs`, `WinFormsTestGuard.cs`, `GuiOwnedProcess.cs` từ owner hiện tại; file cuối chứa cả `GuiTestSafety` và chỉ phụ thuộc BCL/Win32. Link `NativeLookupTypingDriver.cs` nếu các ca pilot cần nó. Không copy hai helper đầu rồi bỏ guard mà chúng cần. [S13][S17]
+Native cases phải dùng STA, message loop khi cần, serialization, exception/DataError capture, timeout và disposal như protections hiện tại. Không reference assembly `Desktop.Tests` để lấy helper vì sẽ kéo lại graph cũ. Phương án nhỏ nhất là link source `StaTest.cs`, `WinFormsTestGuard.cs`, `GuiOwnedProcess.cs` từ owner hiện tại; file cuối chứa cả `GuiTestSafety` và chỉ phụ thuộc BCL/Win32. Nếu cần `NativeLookupTypingDriver.cs`, kiểm dependency trước khi link: `Key(Keys)` hiện gọi `GoodsReceiptInlineEditorTests.Key(key)`. Tách primitive native-key nhỏ để old/new callers dùng chung, hoặc adaptation tương đương có scope hẹp và giữ behavior; không kéo cả lớp test cũ chỉ để lấy helper. Không copy hai helper đầu rồi bỏ guard mà chúng cần. [S13][S17][S18]
 
 Assembly mới cần `[CollectionBehavior(DisableTestParallelization = true)]`. Giữ một lệnh GUI chạy tại một thời điểm; chạy project cũ/mới tuần tự và dừng khi cleanup không xác nhận được. Poison static được compile riêng trong mỗi assembly, không phải cờ dùng chung giữa các testhost. Không tạo test-support project thứ tư chỉ để chứa vài helper của pilot.
 
@@ -265,30 +265,143 @@ Rollback A0 bằng revert PR docs, khôi phục pointer nhất quán. Rollback A
 
 ## 8. Prompt giao việc có thể dùng khi quyết định thực thi
 
-Prompt dưới đây là mẫu để Owner giao việc sau này, không phải một lệnh được kích hoạt bởi việc đọc tài liệu:
+### Giao riêng A1 sau PR A0
+
+Điều kiện bắt đầu là base đã chứa A0 qua [PR #46](https://github.com/chung6a8m/MyDmsVn/pull/46); merge commit là `d827bbbfdf2a55c1d55537cf7c4b3a4963234aa3`. Codex phải kiểm tra lại HEAD và delta khi nhận việc, không dùng baseline khảo sát cũ làm reset target.
+
+**Đây là mẫu để Owner gửi cho Codex, chưa phải lệnh triển khai đang có hiệu lực.** Việc cập nhật hoặc đọc mẫu không đổi quyết định phạm vi trong adoption document. Câu cấp quyền bên trong chỉ có hiệu lực khi Owner gửi nó như yêu cầu thực thi.
+
+Ưu tiên giao trên checkout Windows có toolchain hiện hành và desktop tương tác để chạy cả build lẫn native tests. Mở repo sản phẩm làm workspace chính; cấp quyền đọc Docs bằng checkout phụ hoặc URL. Nếu dùng môi trường thiếu Windows/desktop, phần native sẽ cần một lượt xác minh trên Windows trước khi A1 đạt điều kiện đóng.
 
 ```text
-Triển khai riêng A0–A1 theo hướng dẫn trong MyDmsVn.Docs,
-lấy HEAD đã kiểm tra của MyDmsVn/v1a-pro-ui-next làm base.
+Triển khai RIÊNG A1 — native Sales UI Lab cho chung6a8m/MyDmsVn.
 
-PR 1: thực hiện A0, một plan/status owner và cleanup điều hướng docs.
-PR 2: sau PR 1, tạo native Sales UI Lab theo 6 scenario trong hướng dẫn.
+Tôi chọn thiết kế A1 tại các mục 3–6 của hướng dẫn:
+https://github.com/chung6a8m/MyDmsVn.Docs/blob/main/proposals/2026-10-24-a0-a1-implementation.md
 
-Giữ net48, Local production composition và exact vendor pins.
-Tái dùng SalesReceiptControl/VM/contracts thật; fake ports chỉ ở Lab/test.
-Không mở rộng sang Web/API/runtime/toolkit merger hoặc test cleanup diện rộng.
+Tôi cho phép sửa source/projects/tests/docs cần thiết trong phạm vi A1,
+commit/push một branch mới và tạo PR vào v1a-pro-ui-next để review.
+Chưa merge. Quyền này không bao gồm A2–A5, Web/API, đổi runtime, tạo/gom repo
+hoặc cleanup test diện rộng.
 
-Đọc AGENTS hiện hành, đối chiếu source với baseline báo cáo và ghi delta.
-Kiểm tra theo changed behavior; báo commands/results/environment thực tế.
-Nếu thiếu Windows/GUI, tiếp tục phần source/docs/review làm được,
-ghi native checks BLOCKED / NOT RUN và hướng dẫn chạy phần còn thiếu;
-không tự ghi A1 VERIFIED.
+1. Xác nhận bối cảnh và bắt đầu
 
-Ghi lựa chọn phạm vi vào Docs; tiến độ chỉ ở plan sản phẩm.
-Commit/push các branch và tạo PR để review; chưa merge khi chưa được giao.
+- Đọc AGENTS.md và scoped instructions, AI_CONTEXT.md,
+  docs/plans/README.md và plan được index chọn; tiếp đó docs/TEST_POLICY.md,
+  docs/TEST_STRATEGY.md, tests/README.md và source cần cho A1.
+- Đọc hướng dẫn A1 ở URL trên cùng adoption document của Docs.
+  Ghi commit Docs đã đọc. Nếu không đọc được spec, báo đúng tài liệu còn thiếu;
+  không tự dựng một A1 khác từ tên gọi.
+- A0 đã merge qua PR #46, merge commit:
+  d827bbbfdf2a55c1d55537cf7c4b3a4963234aa3.
+  Fetch HEAD hiện tại của v1a-pro-ui-next, xác nhận chứa A0 và ghi delta.
+  Không reset về 03acacd; không làm lại A0 hoặc tiếp tục branch A0.
+- Dùng branch/worktree sạch, đề xuất codex/a1-sales-ui-lab.
+  Giữ thay đổi của người dùng và checkout submodules theo gitlinks của base;
+  không dùng submodule update --remote.
+- Ghi exact base/pins, môi trường và test scope trước khi sửa.
+
+2. Plan và quyền thực thi
+
+- Ghi việc Owner giao riêng A1 vào plan hiện hành, thêm baseline, tasks,
+  verification A1. Giữ nguyên ý nghĩa scope/results/evidence của A0.
+  Những câu Markdown-only/A1 chưa được giao trước đây phải được đặt rõ
+  trong phạm vi A0; không để chúng mâu thuẫn với nhiệm vụ A1 mới.
+- Chỉ một plan sở hữu trạng thái thực thi; index chỉ trỏ tới plan đó.
+  Không tạo STATUS.md hoặc bảng tiến độ song song.
+- Nếu có quyền ghi MyDmsVn.Docs, cập nhật adoption document đúng phạm vi
+  A1 được giao; không đánh dấu toàn bộ năm lựa chọn kiến trúc là đã duyệt.
+  Nếu chưa có quyền, ghi rõ phần quyết định cần đồng bộ trong handoff;
+  tiếp tục công việc sản phẩm đã được giao.
+
+3. Đầu ra và ranh giới
+
+Tạo ba project cùng solution riêng theo hướng dẫn:
+- samples/MyDmsVn.Desktop.UiLab: executable WinForms net48.
+- samples/MyDmsVn.Desktop.UiLab.Scenarios: fixtures/fake ports/session/gates;
+  dùng chung cho Lab và tests, không phụ thuộc WinForms.
+- tests/MyDmsVn.Desktop.Ui.Tests: focused scenario/native tests net48.
+- MyDmsVn.UiLab.sln.
+- docs/development/UI_LAB.md: runbook với lệnh, scenario và giới hạn thực tế.
+
+Dùng SalesReceiptControl, VMs, contracts và toolkit thật.
+Gọi public constructor bảy dependency hiện có; không clone màn hình.
+Dùng Windows Forms synchronization context thật với STA/message loop;
+lookup factory tạo VM mới mỗi lần gọi.
+Dirty-close dùng coordinator thật; cho phép friend access hẹp cho đúng
+hai assembly Lab/test như hướng dẫn, không public hóa hoặc viết lại policy.
+
+Giữ net48, SDK/package versions, Local production composition và vendor pins.
+Fake chỉ thuộc Lab/test; không thêm mock mode vào ứng dụng giao hàng.
+Kiểm evaluated transitive graph của Lab/tests: không Local, Server.*,
+DbMigrator hoặc SQL fixture composition. Bỏ project khỏi solution chưa đủ.
+Không biến yêu cầu không SQL thành việc gỡ mọi SqlClient package của vendor.
+
+4. Thực hiện theo bốn mốc, có test cùng behavior
+
+A1.1: mở được Draft thật không SQL, build graph nhỏ.
+A1.2: hoàn thiện sáu scenario, fake contracts và lifecycle.
+A1.3: test owner riêng, native regression và mapping coverage được chuyển.
+A1.4: runbook, owner/commands trong docs, clean-checkout verification và PR.
+
+Sáu scenario là tiêu chí hành vi, không chỉ sáu lựa chọn menu:
+- S01 Draft: duplicate ProductId nhưng line identity riêng; Save phản ánh edits.
+- S02 Validation: raw numeric/date lỗi giữ nguyên và chặn mutation;
+  có server field-error variant sau local validation.
+- S03 Lookup race: B hoàn tất trước A; A vẫn trả sau cancellation;
+  thêm session replacement và giữ stale-result guards.
+- S04 Date caret: gõ từng phím, caret/selection/focus, F4/Escape;
+  filter/query chỉ đổi tại admission/Apply đúng contract.
+- S05 Dirty close: Cancel/Discard/Save thành công/thất bại qua coordinator thật;
+  raw input và unknown outcome giữ workspace khi chưa được admit.
+- S06 Unknown Post: dispatch Post đúng một lần; Reload lỗi rồi reload cùng ID
+  trả Posted; không retry/replay Post ngầm.
+
+Fake phải session-bound, phản ánh request thật, có journal/gates và expected
+fixtures độc lập. Preview tính lại trong dải demo được công bố, không copy
+engine nghiệp vụ và không trả tổng cố định bất kể input.
+Reset phải cancel, giải phóng gates, drain hữu hạn với message pump còn chạy,
+dispose trên UI thread rồi tạo graph mới. Không dùng Reset để chứng minh Close.
+
+5. Kiểm chứng
+
+- Theo TEST_POLICY, chọn scope bằng behavior. Chạy toàn bộ project nhỏ mới
+  và regression liên quan khi chạm shared code; không mặc định full SQL/full GUI.
+- Tạo/review lockfiles mới theo versions hiện hành; sau đó xác minh checkout
+  sạch restore locked. Không dùng artifact cũ để báo build/test PASS.
+- Audit dependency của helper source trước khi link. NativeLookupTypingDriver
+  đang gọi GoodsReceiptInlineEditorTests.Key: tách primitive nhỏ dùng chung
+  hoặc adaptation tương đương có scope hẹp, giữ behavior và regression.
+  Không kéo old Desktop.Tests assembly hay cả lớp test chỉ để lấy helper.
+- Giữ STA, serialization, exception/DataError capture, finite waits/disposal;
+  một GUI run tại một thời điểm và cơ chế subprocess hiện hữu cho ca có thể treo.
+  Chỉ thao tác process/resource do run sở hữu; dừng khi cleanup chưa xác nhận.
+- Chỉ dùng selector đã có source/discovery. Ghi actual discovered/executed,
+  pass/fail/skip, candidate/pins, toolchain, bitness và DPI khi liên quan.
+  Không coi zero tests, missing mandatory cases hoặc screenshot là native PASS.
+- Mỗi test chuyển owner có old → behavior → replacement → kết quả.
+  Giữ test cũ đến khi replacement chạy đạt và mapping được review.
+- Production projects không reference Lab/Scenarios; review release inputs.
+  Nếu release graph bị thay đổi, chạy package check tương ứng.
+  Không gán kết quả Lab thành SQL/authentication/production acceptance.
+
+Nếu thiếu Windows/desktop, tiếp tục source/docs/static review làm được;
+ghi native checks BLOCKED / NOT RUN, mở draft PR với lệnh/phần còn thiếu.
+Không đánh dấu A1 COMPLETE/VERIFIED khi exit criteria chưa đạt.
+
+6. Bàn giao
+
+Tiếp tục qua các mốc trong phạm vi đã giao; không dừng chỉ ở bản kế hoạch
+hoặc hỏi lại quyền cho từng thay đổi thông thường. Nếu cần mở rộng phạm vi
+hay thay đổi contract ngoài A1, giải thích điểm xung đột và quyết định cần Owner.
+
+Báo: PR/commits/base/pins; cách mở Lab; scenario results; evaluated graph;
+commands và kết quả thật; test mapping; limitations/blockers.
+Runbook nằm trong repo code, tiến độ chỉ ở sole plan.
+Tạo PR để review, chưa merge.
 ```
 
-Điểm giao việc đầu tiên nên là **PR A0**, vì nó làm cho Codex ở các lượt sau đọc đúng context trước khi thay source.
+Khi nhận kết quả, đối chiếu Definition of Done ở mục 6. PR có source nhưng native checks còn thiếu là kết quả triển khai chưa được xác minh đầy đủ; reviewer cần danh sách lệnh, môi trường và case còn thiếu để tiếp tục đúng candidate. Không phải chạy lại A0 để giao A1.
 
 ## Nguồn đã đối chiếu
 
@@ -311,6 +424,7 @@ Các liên kết dưới dùng commit khảo sát cố định; không phải x�
 [S15]: https://github.com/chung6a8m/MyDmsVn/blob/03acacdaea6a750aa88b33d61ea139379edcb326/tests/MyDmsVn.Desktop.Tests/DesktopDateInputIntegrationTests.cs
 [S16]: https://github.com/chung6a8m/MyDmsVn/blob/03acacdaea6a750aa88b33d61ea139379edcb326/deployment/release/Publish-LocalRelease.ps1#L140-L148
 [S17]: https://github.com/chung6a8m/MyDmsVn/blob/03acacdaea6a750aa88b33d61ea139379edcb326/tests/MyDmsVn.Desktop.Tests/GuiOwnedProcess.cs
+[S18]: https://github.com/chung6a8m/MyDmsVn/blob/d827bbbfdf2a55c1d55537cf7c4b3a4963234aa3/tests/MyDmsVn.Desktop.Tests/NativeLookupTypingDriver.cs#L57-L60
 
 - [AGENTS và chỉ dẫn DateInput ở entry point][S1]; [roadmap ghi kết quả về sau][S2]; [policy chọn scope][S3].
 - [Constructor SalesControl][S5], [dispatcher][S6], [lookup state][S7], [close coordinator][S8], [Save response integrity][S9], [preview facade][S10], [dispose][S11].
